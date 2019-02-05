@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ProgramSTT.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="3.3.0" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.2.0" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
@@ -15,6 +19,12 @@
     <Reference Include="NAudio">
       <HintPath>..\..\..\..\Downloads\irrKlang-64bit-1.6.0\irrKlang-64bit-1.6.0\bin\dotnet-4-64\NAudio.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="sample.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
