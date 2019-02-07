@@ -1,7 +1,6 @@
 ﻿using NetCoreAudio.Interfaces;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace NetCoreAudio.Players
@@ -12,15 +11,19 @@ namespace NetCoreAudio.Players
 
         internal const string PauseProcessCommand = "kill -STOP {0}";
         internal const string ResumeProcessCommand = "kill -CONT {0}";
-        internal const string RecordProcessCommand = "arecord -D hw:1,0 -f cd record.wav -c 1";
+        //internal const string RecordProcessCommand = "arecord -D plughw:1,0 -d 5 -f S16_LE -r 16000 record.wav -c 1";
 
         protected virtual string BashToolName { get; }
 
         public event EventHandler PlaybackFinished;
 
+        public static Boolean guess = false;
+
         public bool Playing { get; private set; }
 
         public bool Paused { get; private set; }
+
+        public bool Comm { get => guess; set => guess = value; }
 
         public async Task Play(string fileName)
         {
@@ -59,10 +62,16 @@ namespace NetCoreAudio.Players
 
         public Task Record()
         {
+            string RecordProcessCommand = "arecord -D plughw:1,0 -f S16_LE -r 16000 record.wav -c 1";
+            if (guess)
+            {
+                RecordProcessCommand = "arecord -D plughw:1,0 -d 5 -f S16_LE -r 16000 record.wav -c 1";
+            }
             Console.WriteLine("recording from microphone");
             var tempProcess = StartBashProcess(RecordProcessCommand);
             //Console.ReadLine();
             //StopRecording();
+            guess = false;
             return Task.CompletedTask;
         }
 

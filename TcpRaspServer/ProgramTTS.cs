@@ -14,6 +14,7 @@ namespace TextToSPeechApp
     class ProgramTTS
     {
         public static WaveFileReader wave = new WaveFileReader(@"sample.wav");
+        public int count = 0;
         public static DirectSoundOut output = null;
         public async Task TextSpeech(string speech)
         {
@@ -22,7 +23,7 @@ namespace TextToSPeechApp
                 // Prompts the user to input text for TTS conversion
                 //Console.Write("What would you like to convert to Speech? ");
                 string text = speech;
-
+                string path = "";
                 // Gets an access token
                 string accessToken;
                 Console.WriteLine("Attempting token exchange. Please wait...\n");
@@ -77,25 +78,11 @@ namespace TextToSPeechApp
                                 using (var fileStream = new FileStream(@"sample.wav", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
                                 {
                                     await dataStream.CopyToAsync(fileStream).ConfigureAwait(false);
-                                    Entry.path = fileStream.Name;
-                                    /*if(count > 0)
-                                    {
-                                        count--;
-                                        File.Create(@"sample" + count + ".wav").Close();
-                                        System.IO.File.Delete(@"sample" + count + ".wav");
-                                    }*/
-                                    
-                                    //count++;
+                                    path = fileStream.Name;
                                 }
-                                Console.WriteLine("\nYour file is ready. Press any key to exit.");
-
+                                //Console.WriteLine("\nYour file is ready. Press any key to exit.");
+                                NetCoreSample.Audio(path);
                                 return;
-                                
-                                //Class1 netcore = new Class1();
-                                //netcore.Audio("C:\\Users\\ogilo\\source\\repos\\TextToSpeech\\sample.wav");
-                                //PlaySound();
-                                //Process.Start("play", @"C:\Users\ogilo\source\repos\TextToSpeech\sample.wav");
-                                //Console.ReadLine();
                             }
                         }
                     }

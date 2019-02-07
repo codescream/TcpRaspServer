@@ -13,7 +13,7 @@ namespace ImageAnalyze
     class ProgramCV
     {
         // subscriptionKey = "0123456789abcdef0123456789ABCDEF"
-        private static string subscriptionKey = "7e1b1a664b584d63b996549612d7d158";
+        private static string subscriptionKey = "7e1b1a664b584d63b996549612d7d158"; //Environment.GetEnvironmentVariable("azure_CV_Key", EnvironmentVariableTarget.User);
 
         static string text = "";
         static string visual = "";

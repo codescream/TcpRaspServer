@@ -51,6 +51,7 @@ namespace RestSTT
             }
             catch (Exception ex)
             {
+                ex.ToString();
                 //Console.WriteLine(string.Format("Failed renewing access token. Details: {0}", ex.Message));
             }
             finally
@@ -61,6 +62,7 @@ namespace RestSTT
                 }
                 catch (Exception ex)
                 {
+                    ex.ToString();
                     //Console.WriteLine(string.Format("Failed to reschedule the timer to renew access token. Details: {0}", ex.Message));
                 }
             }

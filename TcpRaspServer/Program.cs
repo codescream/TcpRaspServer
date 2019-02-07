@@ -1,10 +1,13 @@
 ﻿using CamTheGeek.GpioDotNet;
+using FredQnA;
 using ImageAnalyze;
 using NetCoreAudio;
+using RestSTT;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using TextToSPeechApp;
 
 namespace DemoHarnessUpd
 {
@@ -12,9 +15,12 @@ namespace DemoHarnessUpd
     {
        // public static GpioPin led = new GpioPin(17, Direction.Out);
         public static String[] ctrl_cmd = {"forward", "backward", "left", "right", "stop", "read cpu_temp", "home", "distance", "x+",
-            "x-", "y+", "y-", "xy_home", "Speak", "Image", "Voice", "PlayB", "StopR"};
+            "x-", "y+", "y-", "xy_home", "Speak", "Image", "Voice", "PlayB", "StopR", "AFred", "FredS"};
 
         public static string text = "";
+        static ProgramTTS tts = new ProgramTTS();
+        static Player player = new Player();
+
 
         public static void Main()
         {
@@ -87,14 +93,14 @@ namespace DemoHarnessUpd
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
 
                         // Send back a response.
-                        stream.Write(msg, 0, msg.Length);
+                        //stream.Write(msg, 0, msg.Length);
                         Console.WriteLine("Sent: {0}", data);
                     //}
 
                     //Console.WriteLine("Done!");
 
                     // Shutdown and end connection
-                    client.Close();
+                        //stream.Close();
 
                     Console.WriteLine(data);
 
@@ -173,8 +179,7 @@ namespace DemoHarnessUpd
                     else if (test == ctrl_cmd[13].ToUpper())
                     {
                         Console.WriteLine(data.Remove(dataLen));
-                        Entry entry = new Entry();
-                        entry.Speak(data.Remove(dataLen));
+                        tts.TextSpeech(data.Remove(dataLen)).Wait();
                     }
                     else if (data == ctrl_cmd[14].ToUpper())
                     {
@@ -182,13 +187,11 @@ namespace DemoHarnessUpd
                         ProgramCV imageCV = new ProgramCV();
 
                         string text = imageCV.AnalyzeImage();
-                        Entry entry = new Entry();
-                        entry.Speak(text);
+                        tts.TextSpeech(text).Wait();
                     }
                     else if (data == ctrl_cmd[15].ToUpper())
                     {
                         Console.WriteLine(data.Remove(dataLen));
-                        Player player = new Player();
                         player.Record().Wait();
                     }
                     else if (data == ctrl_cmd[16].ToUpper())
@@ -203,17 +206,34 @@ namespace DemoHarnessUpd
                             path += "/record.wav";
                         }
                         Console.WriteLine(data.Remove(dataLen));
-                        Player player = new Player();
                         player.Play(path).Wait();
-                        //string path = player.Path;
-                        //player.Play(path).Wait();
                     }
                     else if (data == ctrl_cmd[17].ToUpper())
                     {
-                        //Console.WriteLine(data.Remove(dataLen));
-                        //Console.WriteLine("\\n");
-                        Player player = new Player();
                         player.StopRecording().Wait();
+                    }
+                    else if (data == ctrl_cmd[18].ToUpper())
+                    {
+                        ProgramQnA qna = new ProgramQnA();
+                        player.Comm = true;
+                        qna.FredQ().Wait();
+                    }
+                    else if (data == ctrl_cmd[19].ToUpper())
+                    {
+                        //Socket clients = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        string path = Directory.GetCurrentDirectory();
+                        if (path.Contains("\\"))
+                        {
+                            path += "\\record.wav";
+                        }
+                        else
+                        {
+                            path += "/record.wav";
+                        }
+                        //byte[] rec = System.Text.Encoding.ASCII.GetBytes(path);
+                        Byte[] audio = File.ReadAllBytes(path);
+                        //stream.Flush();
+                        stream.WriteAsync(audio, 0, audio.Length);
                     }
                     //while (turnOn)
                     //{

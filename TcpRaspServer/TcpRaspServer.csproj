@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entry.cs" />
     <Compile Remove="ProgramSTT.cs" />
   </ItemGroup>
 
@@ -13,6 +14,7 @@
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="3.3.0" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.2.0" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+    <PackageReference Include="System.Json" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
