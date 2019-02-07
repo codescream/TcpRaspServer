@@ -31,7 +31,7 @@ namespace RestSTT
 
             // Note: Sign up at https://azure.microsoft.com/en-us/try/cognitive-services/ to get a subscription key.  
             // Navigate to the Speech tab and select Bing Speech API. Use the subscription key as Client secret below.
-            AuthenticationSTT auth = new AuthenticationSTT("de48ef5b15d34f6498fbd831f5d72aec");//Environment.GetEnvironmentVariable("azure_STT_Key", EnvironmentVariableTarget.User));
+            AuthenticationSTT auth = new AuthenticationSTT(Environment.GetEnvironmentVariable("azure_STT_Key", EnvironmentVariableTarget.User));
 
             string requestUri = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US"; //args[0];/*.Trim(new char[] { '/', '?' });*/
 

@@ -30,7 +30,7 @@ namespace TextToSPeechApp
 
                 // Add your subscription key here
                 // If your resource isn't in WEST US, change the endpoint
-                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", "de48ef5b15d34f6498fbd831f5d72aec");
+                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", Environment.GetEnvironmentVariable("azure_STT_Key", EnvironmentVariableTarget.User));
                 try
                 {
                     accessToken = await auth.FetchTokenAsync().ConfigureAwait(false);
