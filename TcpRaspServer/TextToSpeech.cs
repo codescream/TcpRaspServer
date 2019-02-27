@@ -75,7 +75,7 @@ namespace TextToSPeechApp
                             {
                                 Console.WriteLine("Your speech file is being written to file...");
                                 wave.Close();
-                                using (var fileStream = new FileStream(@"sample" + count + ".wav", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                                using (var fileStream = new FileStream(@"sample.wav", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
                                 {
                                     await dataStream.CopyToAsync(fileStream).ConfigureAwait(false);
                                     path = fileStream.Name;
