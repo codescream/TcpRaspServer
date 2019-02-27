@@ -26,7 +26,7 @@ namespace IdentVoice
             var queryString = HttpUtility.ParseQueryString(string.Empty);
 
             // Request headers
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "3d0eb2b328f8409f896012b0eb163633");
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Environment.GetEnvironmentVariable("azure_SpkRec_Key", EnvironmentVariableTarget.User));
 
             // get all profiles call
             var uri = "https://westus.api.cognitive.microsoft.com/spid/v1.0/identificationProfiles?";

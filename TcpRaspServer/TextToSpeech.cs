@@ -30,7 +30,7 @@ namespace TextToSPeechApp
 
                 // Add your subscription key here
                 // If your resource isn't in WEST US, change the endpoint
-                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", "de48ef5b15d34f6498fbd831f5d72aec");
+                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", Environment.GetEnvironmentVariable("azure_TTS_Key", EnvironmentVariableTarget.User));
                 try
                 {
                     accessToken = await auth.FetchTokenAsync().ConfigureAwait(false);
@@ -75,7 +75,7 @@ namespace TextToSPeechApp
                             {
                                 Console.WriteLine("Your speech file is being written to file...");
                                 wave.Close();
-                                using (var fileStream = new FileStream(@"sample.wav", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+                                using (var fileStream = new FileStream(@"sample" + count + ".wav", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
                                 {
                                     await dataStream.CopyToAsync(fileStream).ConfigureAwait(false);
                                     path = fileStream.Name;

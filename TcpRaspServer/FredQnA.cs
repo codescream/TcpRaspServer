@@ -13,7 +13,7 @@ namespace FredQnA
     class FredQnA
     {
         public static HttpClient client = new HttpClient();
-        static string appKey = "YU8PVU-HW9YK7TA7E";// Environment.GetEnvironmentVariable("Wolfram_App_Key", EnvironmentVariableTarget.User);
+        static string appKey = Environment.GetEnvironmentVariable("Wolfram_App_Key", EnvironmentVariableTarget.User);
         static string wolframText = "";
         static string welcome = "";
         public static SpeechToText speech = new SpeechToText();
