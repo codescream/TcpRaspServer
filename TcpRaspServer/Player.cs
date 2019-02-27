@@ -25,8 +25,6 @@ namespace NetCoreAudio
         /// </summary>
         public bool Paused => _internalPlayer.Paused;
 
-        public bool Comm { get => _internalPlayer.Comm; set => _internalPlayer.Comm = value; }
-
         public Player()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

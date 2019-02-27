@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace RecordAudio
 {
-    static class ProgramREC
+    public static class RecordAudio
     {
         /*[DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         private static extern int mciSendString(string lpstrCommand, string lpstrReturnString, int uReturnLength, int hwndCallback);*/
@@ -12,7 +12,7 @@ namespace RecordAudio
 
         public static async Task Record()
         {
-            Console.WriteLine("recording for only 5secs....");
+            Console.WriteLine("recording for only 3secs....");
             await player.Record();
         }
 

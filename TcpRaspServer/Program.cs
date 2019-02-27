@@ -3,11 +3,14 @@ using FredQnA;
 using ImageAnalyze;
 using NetCoreAudio;
 using RestSTT;
+using SpeakerRecognition;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using TcpRaspServer.Utility;
 using TextToSPeechApp;
+using UpdatedKB;
 
 namespace DemoHarnessUpd
 {
@@ -15,10 +18,10 @@ namespace DemoHarnessUpd
     {
        // public static GpioPin led = new GpioPin(17, Direction.Out);
         public static String[] ctrl_cmd = {"forward", "backward", "left", "right", "stop", "read cpu_temp", "home", "distance", "x+",
-            "x-", "y+", "y-", "xy_home", "Speak", "Image", "Voice", "PlayB", "StopR", "AFred", "FredS"};
+            "x-", "y+", "y-", "xy_home", "Speak", "Image", "Voice", "PlayB", "StopR", "AFred", "FredS", "Reco1", "Reco2", "ConfE", "CancE", "UpdKB", "GetEn", "DelPr"};
 
         public static string text = "";
-        static ProgramTTS tts = new ProgramTTS();
+        static TextToSpeech tts = new TextToSpeech();
         static Player player = new Player();
 
 
@@ -53,7 +56,7 @@ namespace DemoHarnessUpd
                 server.Start();
 
                 // Buffer for reading data
-                Byte[] bytes = new Byte[256];
+                Byte[] bytes = new Byte[1024];
                 String data = null;
 
                 // Enter the listening loop.
@@ -176,25 +179,26 @@ namespace DemoHarnessUpd
                     {
                         //xy_home
                     }
-                    else if (test == ctrl_cmd[13].ToUpper())
+                    else if (test == ctrl_cmd[13].ToUpper()) // Speak
                     {
                         Console.WriteLine(data.Remove(dataLen));
-                        tts.TextSpeech(data.Remove(dataLen)).Wait();
+                        tts.TextToWords(data.Remove(dataLen)).Wait();
                     }
-                    else if (data == ctrl_cmd[14].ToUpper())
+                    else if (data == ctrl_cmd[14].ToUpper()) // Image and Read-CV
                     {
                         Console.WriteLine(data.Remove(dataLen));
-                        ProgramCV imageCV = new ProgramCV();
+                        CompVision imageCV = new CompVision();
 
                         string text = imageCV.AnalyzeImage();
-                        tts.TextSpeech(text).Wait();
+                        tts.TextToWords(text).Wait();
                     }
-                    else if (data == ctrl_cmd[15].ToUpper())
+                    else if (data == ctrl_cmd[15].ToUpper()) // Voice - Record
                     {
+                        VarHolder.LinuxRecTime = "";
                         Console.WriteLine(data.Remove(dataLen));
                         player.Record().Wait();
                     }
-                    else if (data == ctrl_cmd[16].ToUpper())
+                    else if (data == ctrl_cmd[16].ToUpper()) // PlayBack recording
                     {
                         string path = Directory.GetCurrentDirectory();
                         if(path.Contains("\\"))
@@ -208,19 +212,19 @@ namespace DemoHarnessUpd
                         Console.WriteLine(data.Remove(dataLen));
                         player.Play(path).Wait();
                     }
-                    else if (data == ctrl_cmd[17].ToUpper())
+                    else if (data == ctrl_cmd[17].ToUpper()) // Stop recording
                     {
+                        VarHolder.LinuxRecTime = "";
                         player.StopRecording().Wait();
                     }
-                    else if (data == ctrl_cmd[18].ToUpper())
+                    else if (data == ctrl_cmd[18].ToUpper()) // Ask Fred - QnA
                     {
-                        ProgramQnA qna = new ProgramQnA();
-                        player.Comm = true;
+                        VarHolder.LinuxRecTime = "-d 5";
+                        FredQnA.FredQnA qna = new FredQnA.FredQnA();
                         qna.FredQ().Wait();
                     }
-                    else if (data == ctrl_cmd[19].ToUpper())
+                    else if (data == ctrl_cmd[19].ToUpper()) // Fred Spy
                     {
-                        //Socket clients = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                         string path = Directory.GetCurrentDirectory();
                         if (path.Contains("\\"))
                         {
@@ -230,10 +234,58 @@ namespace DemoHarnessUpd
                         {
                             path += "/record.wav";
                         }
-                        //byte[] rec = System.Text.Encoding.ASCII.GetBytes(path);
                         Byte[] audio = File.ReadAllBytes(path);
-                        //stream.Flush();
                         stream.WriteAsync(audio, 0, audio.Length);
+                    }
+                    else if (test == ctrl_cmd[20].ToUpper()) // Record 1st voice profile
+                    {
+                        VarHolder.LinuxRecTime = "-d 10";
+                        VoiceSignature.RecVoiceOne(data.Remove(dataLen)).Wait();
+                    }
+                    else if (data == ctrl_cmd[21].ToUpper()) // Record 2nd voice profile
+                    {
+                        VarHolder.LinuxRecTime = "-d 10";
+                        VoiceSignature.RecVoiceTwo().Wait();
+                    }
+                    else if (data == ctrl_cmd[22].ToUpper()) // Confirm enrollment
+                    {
+                        VoiceSignature.ConfirmEnroll();
+                    }
+                    else if (data == ctrl_cmd[23].ToUpper()) // Cancel enrollment
+                    {
+                        VoiceSignature.CancelEnroll();
+                    }
+                    else if (test == ctrl_cmd[24].ToUpper()) // Update Fred KB
+                    {                        
+                        string trial = data.Remove(dataLen);
+                        string[] splitTrial = trial.Split(";");
+                        string[] question = new string[splitTrial.Length];
+                        string[] answer = new string[splitTrial.Length];
+                        for (int j = 0; j < splitTrial.Length; j++)
+                        {
+                            question[j] = splitTrial[j].Split(":")[0].Replace("'", "");
+                            answer[j] = splitTrial[j].Split(":")[1].Replace("'", "");
+                        }
+                        UpdateFredKB.UpdateKB(question, answer);
+                    }
+                    else if (data == ctrl_cmd[25].ToUpper()) // Retrieve enrollment
+                    {
+                        string path = Directory.GetCurrentDirectory();
+                        if (path.Contains("\\"))
+                        {
+                            path += "\\speaker_recog.txt";
+                        }
+                        else
+                        {
+                            path += "/speaker_recog.txt";
+                        }
+                        Byte[] text = File.ReadAllBytes(path);
+                        stream.WriteAsync(text, 0, text.Length);
+                    }
+                    else if (test == ctrl_cmd[26].ToUpper()) // Delete voice profile
+                    {
+                        string profileId = data.Remove(dataLen).ToLower();
+                        VoiceSignature.DeleteProfile(profileId);
                     }
                     //while (turnOn)
                     //{

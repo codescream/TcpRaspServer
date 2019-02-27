@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using TcpRaspServer.Utility;
 
 namespace NetCoreAudio.Players
 {
@@ -17,23 +18,21 @@ namespace NetCoreAudio.Players
 
         public event EventHandler PlaybackFinished;
 
-        public static Boolean guess = false;
-
         public bool Playing { get; private set; }
 
         public bool Paused { get; private set; }
 
-        public bool Comm { get => guess; set => guess = value; }
-
-        public async Task Play(string fileName)
+        public Task Play(string fileName)
         {
-            await Stop();
+            //await Stop();
             _process = StartBashProcess($"{BashToolName} '{fileName}'");
             _process.EnableRaisingEvents = true;
             _process.Exited += HandlePlaybackFinished;
             _process.ErrorDataReceived += HandlePlaybackFinished;
             _process.Disposed += HandlePlaybackFinished;
             Playing = true;
+
+            return Task.CompletedTask;
         }
 
         public Task Pause()
@@ -62,16 +61,10 @@ namespace NetCoreAudio.Players
 
         public Task Record()
         {
-            string RecordProcessCommand = "arecord -D plughw:1,0 -f S16_LE -r 16000 record.wav -c 1";
-            if (guess)
-            {
-                RecordProcessCommand = "arecord -D plughw:1,0 -d 5 -f S16_LE -r 16000 record.wav -c 1";
-            }
+            string RecordProcessCommand = $"arecord -D plughw:1,0 " + VarHolder.LinuxRecTime + " -f S16_LE -r 16000 record.wav -c 1";
             Console.WriteLine("recording from microphone");
             var tempProcess = StartBashProcess(RecordProcessCommand);
-            //Console.ReadLine();
-            //StopRecording();
-            guess = false;
+
             return Task.CompletedTask;
         }
 

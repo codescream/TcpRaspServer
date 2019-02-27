@@ -3,18 +3,17 @@ using System.Net;
 using System.IO;
 using System.Collections.Generic;
 using MovieMarvel;
-using RecordAudio;
 using System.Threading;
 using System.Threading.Tasks;
 using TextToSPeechApp;
 
 namespace RestSTT
 {
-    class ProgramRestSTT
+    class SpeechToText
     {
         public static string text = "";
         public static int noSpeech = 0;
-        public async Task SpeechToText()
+        public async Task WordsToText()
         {
             /*if ((args.Length < 2) || (string.IsNullOrWhiteSpace(args[0])))
             {
@@ -24,14 +23,14 @@ namespace RestSTT
                 return;
             }*/
 
-            await ProgramREC.Record();
+            await RecordAudio.RecordAudio.Record();
             Thread.Sleep(3000); // allows 5secs of recording
-            await ProgramREC.StopRecording();
+            await RecordAudio.RecordAudio.StopRecording();
 
 
             // Note: Sign up at https://azure.microsoft.com/en-us/try/cognitive-services/ to get a subscription key.  
             // Navigate to the Speech tab and select Bing Speech API. Use the subscription key as Client secret below.
-            AuthenticationSTT auth = new AuthenticationSTT(Environment.GetEnvironmentVariable("azure_STT_Key", EnvironmentVariableTarget.User));
+            AuthenticationSTT auth = new AuthenticationSTT("de48ef5b15d34f6498fbd831f5d72aec");//Environment.GetEnvironmentVariable("azure_STT_Key", EnvironmentVariableTarget.User));
 
             string requestUri = "https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US"; //args[0];/*.Trim(new char[] { '/', '?' });*/
 

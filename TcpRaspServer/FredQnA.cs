@@ -1,4 +1,5 @@
 ﻿using FredKB;
+using IdentVoice;
 using MovieMarvel;
 using RestSTT;
 using System;
@@ -9,23 +10,25 @@ using TextToSPeechApp;
 
 namespace FredQnA
 {
-    class ProgramQnA
+    class FredQnA
     {
         public static HttpClient client = new HttpClient();
-        static string appKey = Environment.GetEnvironmentVariable("Wolfram_App_Key", EnvironmentVariableTarget.User);
+        static string appKey = "YU8PVU-HW9YK7TA7E";// Environment.GetEnvironmentVariable("Wolfram_App_Key", EnvironmentVariableTarget.User);
         static string wolframText = "";
-        public static ProgramRestSTT speech = new ProgramRestSTT();
-        static ProgramTTS tts = new ProgramTTS();
+        static string welcome = "";
+        public static SpeechToText speech = new SpeechToText();
+        static TextToSpeech tts = new TextToSpeech();
         public static string word = "";
         public static string cmd = "";
 
         public async Task FredQ()
         {
-            await tts.TextSpeech("I am listening...");
+            wolframText = "";
+            await tts.TextToWords("I am listening...");
 
-            speech.SpeechToText().Wait();
+            speech.WordsToText().Wait();
 
-            string voice = ProgramRestSTT.text.ToLower();
+            string voice = SpeechToText.text.ToLower();
 
             if(voice == "nothing recorded")
             {
@@ -33,7 +36,8 @@ namespace FredQnA
             }
             else
             {
-                cmd = ProgramKB.FredKB(voice);
+                cmd = KnowledgeBase.FredKB(voice);
+                welcome = await VoiceIdentification.IdentVoice();
             }
                 
             cmd = cmd.Replace("\"", "");
@@ -41,7 +45,7 @@ namespace FredQnA
             {
                 case "Fred Sees":
                 {
-                    tts.TextSpeech("I see you Mark!").Wait();
+                    tts.TextToWords("I see you Mark!").Wait();
                     break;
                 }
                 // run Fred Sees code
@@ -55,33 +59,40 @@ namespace FredQnA
                     // run Light Off code
                     break;
                 default:
-                    FredQnA().Wait();
+                    AskFred().Wait();
                     break;
             }
         }
 
-        public static async Task FredQnA()
+        public static async Task AskFred()
         {
             //Console.WriteLine("Please ask your question");
             //await speech.SpeechToText();
-            string question = ProgramRestSTT.text;
-            if (question.Equals("nothing recorded"))
+            string question = SpeechToText.text;
+            if (question.Equals("Nothing recorded"))
             {
-                tts.TextSpeech("I didn't hear a question...").Wait();
+                tts.TextToWords(wolframText + "I didn't hear a question...").Wait();
                 // do  nothing!
             }
             else
             {
-                wolframText = ProgramKB.FredKB(question);
+                wolframText = cmd; // ProgramKB.FredKB(question); // apply 'cmd' variable here instead
 
                 if (wolframText == "")
                 {
                     await GetAnswer(question);
-                    tts.TextSpeech(wolframText).Wait();
+                    if(wolframText == "")
+                    {
+                        tts.TextToWords(welcome + "please rephrase your question").Wait();
+                    }
+                    else
+                    {
+                        tts.TextToWords(welcome + " The answer is \n " + wolframText).Wait();
+                    }
                 }
                 else
                 {
-                    tts.TextSpeech(wolframText).Wait();
+                    tts.TextToWords(welcome + " The answer is \n " + wolframText).Wait();
                 }
             }
         }
@@ -112,7 +123,8 @@ namespace FredQnA
             }
             else
             {
-                tts.TextSpeech("please rephrase your question").Wait();
+                wolframText = "";
+              //  tts.TextSpeech("please rephrase your question").Wait();
             }
         }
 

@@ -11,18 +11,18 @@ using TextToSPeechApp;
 
 namespace TextToSPeechApp
 {
-    class ProgramTTS
+    class TextToSpeech
     {
         public static WaveFileReader wave = new WaveFileReader(@"sample.wav");
         public int count = 0;
         public static DirectSoundOut output = null;
-        public async Task TextSpeech(string speech)
+        public async Task TextToWords(string textInput)
         {
             while (true)
             {
                 // Prompts the user to input text for TTS conversion
                 //Console.Write("What would you like to convert to Speech? ");
-                string text = speech;
+                string text = textInput;
                 string path = "";
                 // Gets an access token
                 string accessToken;
@@ -30,7 +30,7 @@ namespace TextToSPeechApp
 
                 // Add your subscription key here
                 // If your resource isn't in WEST US, change the endpoint
-                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", Environment.GetEnvironmentVariable("azure_STT_Key", EnvironmentVariableTarget.User));
+                Authentication auth = new Authentication("https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken", "de48ef5b15d34f6498fbd831f5d72aec");
                 try
                 {
                     accessToken = await auth.FetchTokenAsync().ConfigureAwait(false);
@@ -79,6 +79,7 @@ namespace TextToSPeechApp
                                 {
                                     await dataStream.CopyToAsync(fileStream).ConfigureAwait(false);
                                     path = fileStream.Name;
+                                    count++;
                                 }
                                 //Console.WriteLine("\nYour file is ready. Press any key to exit.");
                                 NetCoreSample.Audio(path);

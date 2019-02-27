@@ -9,7 +9,6 @@ namespace NetCoreAudio.Interfaces
 
         bool Playing { get; }
         bool Paused { get; }
-        bool Comm { get; set; }
 
         Task Play(string fileName);
         Task Pause();
